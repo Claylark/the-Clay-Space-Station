@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clay's Space</title>
+  <title>星壤空间站 | the Clay Space Station</title>
   <!-- 引入外部资源 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -70,6 +70,10 @@
       .nav-active {
         @apply text-primary border-b-2 border-primary pb-1;
       }
+      /* CN小窗口样式 */
+      .cn-window {
+        @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow;
+      }
     }
   </style>
 </head>
@@ -85,8 +89,10 @@
   <!-- 导航栏 -->
   <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50 transition-all duration-300 shadow-sm" id="navbar">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span class="font-bold text-xl text-primary">Clay's Space</span>
+      <div class="flex items-center space-x-2 relative">
+        <!-- 顶栏标题修改：主标题the Clay Space Station + 右下角重叠星壤空间站 -->
+        <span class="font-bold text-xl text-primary relative z-10">the Clay Space Station</span>
+        <span class="absolute right-0 bottom-[-8px] text-xs text-primary/70 font-medium z-0">星壤空间站</span>
       </div>
       
       <!-- 桌面端导航 -->
@@ -128,7 +134,7 @@
         你好你好，这里Clay
       </h1>
       <p class="text-[clamp(1rem,2vw,1.25rem)] text-slate-600 mb-8 max-w-2xl mx-auto">
-        ENFP话痨 | 星穹铁道狂热爱好者 | 轻度收集控 | 程序猿
+        ENFP话痨 | 星穹铁道狂热爱好者 | 地理爱好者 | 轻度收集控 | 程序猿
       </p>
       
       <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -156,8 +162,16 @@
               <div class="bg-purple-50 rounded-xl p-6 h-full border border-purple-100">
                 <h3 class="text-lg font-semibold mb-4 text-primary">基本信息</h3>
                 <ul class="space-y-4">
-                  <li class="flex items-start">
-                    <span>CN：Clay</span>
+                  <!-- 修改后的CN小窗口 -->
+                  <li>
+                    <div class="cn-window">
+                      <div class="text-base font-medium text-slate-900 mb-2">CN</div>
+                      <div class="space-y-2">
+                        <span class="block text-xl font-bold text-primary">星壤</span>
+                        <span class="block text-lg font-semibold text-primary">Clay</span>
+                        <span class="block text-base text-slate-800">Claylark</span>
+                      </div>
+                    </div>
                   </li>
                   <li class="flex items-start">
                     <span>坐标：南京</span>
@@ -183,6 +197,7 @@
               <div class="flex flex-wrap gap-3 mb-6">
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">ENFP</span>
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">星穹铁道狂热爱好者</span>
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">地理爱好者</span>
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">话痨体质</span>
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">轻度收集控</span>
               </div>
@@ -192,6 +207,7 @@
                 <span class="px-4 py-2 bg-rail/10 text-rail rounded-full text-sm font-medium tag-hover border border-rail/20">撸代码</span>
                 <span class="px-4 py-2 bg-rail/10 text-rail rounded-full text-sm font-medium tag-hover border border-rail/20">整理银行卡</span>
                 <span class="px-4 py-2 bg-rail/10 text-rail rounded-full text-sm font-medium tag-hover border border-rail/20">研究平面设计</span>
+                <span class="px-4 py-2 bg-rail/10 text-rail rounded-full text-sm font-medium tag-hover border border-rail/20">地理研究</span>
               </div>
               
               <h3 class="text-lg font-semibold mb-4">备注</h3>
@@ -305,6 +321,9 @@
             <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
               写代码
             </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              地理研究
+            </span>
           </div>
         </div>
         
@@ -386,6 +405,10 @@
               </li>
               <li class="flex items-start">
                 <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>地理爱好者</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
                 <span>程序猿<br><span class="text-slate-500 text-sm">(有程序员会玩扩列吗（思考）)</span></span>
               </li>
             </ul>
@@ -412,6 +435,10 @@
               <li class="flex items-start">
                 <i class="fa fa-comment text-primary mt-1 mr-3"></i>
                 <span>代码小技巧/项目交流</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>地理研究与探索</span>
               </li>
               <li class="flex items-start">
                 <i class="fa fa-comment text-primary mt-1 mr-3"></i>
@@ -511,7 +538,7 @@
           </div>
           
           <div class="mt-8 text-center">
-            <p class="text-slate-600">点击可直接跳转对应平台，祝愉扩！</p>
+            <p class="text-slate-600">点击可直接跳转对应平台，祝蛞蝓！</p>
           </div>
         </div>
       </div>
@@ -521,7 +548,7 @@
   <!-- 页脚 -->
   <footer class="bg-white/80 backdrop-blur-md py-6 border-t border-slate-100 relative z-10">
     <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
-      <p>Clay's Space &copy; 2025-2026 保留所有权利</p>
+      <p>星壤空间站 the Clay Space Station &copy; 2025-2026 保留所有权利</p>
       <p class="mt-2">愿此行，终抵群星！</p> 
       <p class="mt-2">ICP备案号 不存在</p>
     </div>
