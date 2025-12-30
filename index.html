@@ -20,6 +20,7 @@
             accent: '#EC4899',
             rail: '#0EA5E9',
             light: '#F8FAFC',
+            gold: '#DAA520', // 添加暗金色
             mika: { //零宇配色方案
               primary: '#E9488A', // 粉紫色
               secondary: '#F472B6', // 浅粉色
@@ -110,6 +111,47 @@
       .timeline-item:last-child::after {
         display: none;
       }
+      /* 视频卡片特殊样式 */
+      .video-card {
+        position: relative;
+        overflow: hidden;
+      }
+      .video-card video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      /* 图片渐变叠加效果 */
+      .image-gradient {
+        position: relative;
+        overflow: hidden;
+      }
+      .image-gradient::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .image-gradient-light::after {
+        background: linear-gradient(to top, rgba(124, 58, 237, 0.2), transparent);
+      }
+      .avatar-gradient::after {
+        background: linear-gradient(to top, rgba(124, 58, 237, 0.3), transparent);
+        height: 100%;
+        border-radius: 50%;
+      }
+      /* 主推角色名称样式 */
+      .character-name {
+        color: gold;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      }
     }
   </style>
 </head>
@@ -161,8 +203,8 @@
   <!-- 英雄区域 -->
   <header class="pt-32 pb-20 md:pt-40 md:pb-32 px-4 text-center relative z-10">
     <div class="container mx-auto max-w-4xl">
-      <!-- 头像 -->
-      <div class="relative w-36 h-36 md:w-48 md:h-48 mx-auto mb-8 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg transform transition-transform hover:scale-105">
+      <!-- 头像 - 添加渐变效果 -->
+      <div class="relative w-36 h-36 md:w-48 md:h-48 mx-auto mb-8 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg transform transition-transform hover:scale-105 avatar-gradient">
         <img src="https://images.castorice.co/clay.castorice.co/images/Head.jpg" alt="Clay的头像" 
              class="w-full h-full object-cover" loading="lazy">
         <div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
@@ -273,68 +315,97 @@
             主推角色
           </h3>
           
-          <div id="character-scroll" class="flex gap-6 py-4 overflow-x-auto scroll-container">
+          <div id="character-scroll" class="flex gap-6 py-4 overflow-x-auto scroll-container content-auto">
             <div class="flex gap-6">
               <!-- 1. 流萤资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/Firefly.jpg" alt="流萤" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">流萤</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">流萤</h3>
                 </div>
               </div>
               
               <!-- 2. 知更鸟资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/Robin.jpg" alt="知更鸟" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">知更鸟</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">知更鸟</h3>
                 </div>
               </div>
               
               <!-- 3. 遐蝶资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/Castorice.jpg" alt="遐蝶" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">遐蝶</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">遐蝶</h3>
                 </div>
               </div>
               
               <!-- 4. 阮·梅资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/RuanMei.jpg" alt="阮·梅" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">阮·梅</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">阮·梅</h3>
                 </div>
               </div>
               
               <!-- 5. 爱莉希雅资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/Elysia.jpg" alt="爱莉希雅" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">爱莉希雅</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">爱莉希雅</h3>
                 </div>
               </div>
               
-              <!-- 6. 昔涟资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/Cyrene.jpg" alt="昔涟" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">昔涟</h3>
+              <!-- 6. 昔涟资料卡 - 视频卡片 -->
+              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover video-card">
+                <div class="h-48 overflow-hidden relative image-gradient">
+                  <!-- 视频替换图片 -->
+                  <video 
+                    class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    loading="lazy"
+                  >
+                    <!-- WebM格式（首选） -->
+                    <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.webm" type="video/webm">
+                    
+                    <!-- MP4格式（兼容性最好） -->
+                    <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.mp4" type="video/mp4">
+                    
+                    <!-- OGG格式（备用） -->
+                    <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.ogv" type="video/ogg">
+                    
+                    <!-- 如果都不支持，显示备用图片 -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 text-white p-4">
+                      <i class="fa fa-video-camera text-3xl mb-2 opacity-50"></i>
+                      <p class="text-center text-xs">视频无法播放<br>请点击查看</p>
+                      <a href="https://images.castorice.co/clay.castorice.co/videos/Cyrene.mp4" 
+                         target="_blank" 
+                         class="mt-2 px-3 py-1 bg-primary text-white text-xs rounded-full hover:bg-primary/80 transition-colors">
+                        查看视频
+                      </a>
+                    </div>
+                  </video>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-primary/10"></div>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">昔涟</h3>
                 </div>
               </div>
               
               <!-- 7. 大黑塔资料卡 -->
               <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative">
+                <div class="h-48 overflow-hidden relative image-gradient">
                   <img src="https://images.castorice.co/clay.castorice.co/images/TheHerta.jpg" alt="大黑塔" 
                        class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
-                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">大黑塔</h3>
+                  <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">大黑塔</h3>
                 </div>
               </div>
             </div>
@@ -574,6 +645,18 @@
                 <a href="mailto:clay@castorice.co" class="block text-sm hover:text-primary transition-colors">clay@castorice.co</a>
               </div>
             </div>
+            
+            <!-- 7. 微信（修改版：增强复制+跳转功能） -->
+            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm cursor-pointer" id="wechatCard">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                <i class="fa fa-wechat text-primary text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-medium text-sm text-slate-500">微信</h4>
+                <div class="text-lg text-primary" id="wechatId">Clay1273540767</div>
+                <p class="text-xs text-slate-500 mt-1">点击卡片复制并跳转微信</p>
+              </div>
+            </div>
           </div>
           
           <div class="mt-8 text-center">
@@ -590,9 +673,9 @@
           <div class="grid grid-cols-1 gap-8">
             <!-- 零宇推荐卡片 - 使用零宇专属配色 -->
             <div class="bg-gradient-to-br from-mika-primary/5 to-mika-secondary/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-mika-primary/20">
-              <!-- 头像区域 -->
+              <!-- 头像区域 - 添加渐变效果 -->
               <div class="p-6 flex items-center border-b border-mika-primary/30">
-                <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5">
+                <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5 relative avatar-gradient image-gradient-light">
                   <img src="https://raw.githubusercontent.com/Claylark/ETERNAL-Space/refs/heads/main/IMG_20251008_013934.jpg" 
                       alt="零宇/永焰鸟头像" 
                       class="w-full h-full object-cover" loading="lazy">
@@ -635,9 +718,9 @@
             
             <!-- 平仲推荐卡片 - 使用平仲专属配色 -->
             <div class="bg-gradient-to-br from-pingzhong-light to-pingzhong-primary/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-pingzhong-primary/20 mt-8">
-              <!-- 头像区域 -->
+              <!-- 头像区域 - 添加渐变效果 -->
               <div class="p-6 flex items-center border-b border-pingzhong-primary/30">
-                <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5">
+                <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5 relative avatar-gradient image-gradient-light">
                   <img src="https://raw.githubusercontent.com/Claylark/92-Space-Station/refs/heads/main/92head.jpg" alt="平仲的头像" class="w-full h-full object-cover" loading="lazy">
                 </div>
                 <div>
@@ -801,6 +884,154 @@
     document.querySelectorAll('.card-hover').forEach(card => {
       card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
     });
+    
+    // 视频自动播放兼容性处理（增强版错误处理）
+    document.addEventListener('DOMContentLoaded', function() {
+      const videoElements = document.querySelectorAll('video');
+      videoElements.forEach(videoElement => {
+        if (videoElement) {
+          // 设置预加载为元数据
+          videoElement.preload = 'metadata';
+          
+          // 监听错误事件
+          videoElement.addEventListener('error', function(e) {
+            console.log('视频加载失败:', videoElement.src, e);
+            
+            // 尝试切换到下一个源
+            const sources = videoElement.querySelectorAll('source');
+            if (sources && sources.length > 1) {
+              // 如果有多个源，切换到下一个
+              const currentSrc = videoElement.currentSrc || videoElement.src;
+              for (let i = 0; i < sources.length; i++) {
+                if (sources[i].src === currentSrc) {
+                  const nextSrc = sources[(i + 1) % sources.length];
+                  videoElement.src = nextSrc.src;
+                  videoElement.load();
+                  break;
+                }
+              }
+            }
+            
+            // 显示用户友好的提示
+            const videoContainer = videoElement.closest('.video-card');
+            if (videoContainer && !videoContainer.querySelector('.video-fallback')) {
+              const fallbackDiv = document.createElement('div');
+              fallbackDiv.className = 'video-fallback absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 text-white p-4';
+              fallbackDiv.innerHTML = `
+                <i class="fa fa-video-camera text-3xl mb-2 opacity-50"></i>
+                <p class="text-center text-xs">视频无法播放<br>请点击查看</p>
+                <a href="${videoElement.src || videoElement.currentSrc || '#'}" 
+                   target="_blank" 
+                   class="mt-2 px-3 py-1 bg-primary text-white text-xs rounded-full hover:bg-primary/80 transition-colors">
+                  查看视频
+                </a>
+              `;
+              videoContainer.appendChild(fallbackDiv);
+            }
+          });
+          
+          // 监听加载完成
+          videoElement.addEventListener('loadedmetadata', function() {
+            console.log('视频元数据加载完成');
+          });
+          
+          // 监听播放就绪
+          videoElement.addEventListener('canplay', function() {
+            console.log('视频可以播放');
+          });
+          
+          // 检查是否可以自动播放
+          videoElement.play().then(() => {
+            console.log('视频自动播放成功');
+          }).catch(error => {
+            console.log('自动播放被阻止:', error);
+            // 用户交互后播放的逻辑
+            const videoContainer = videoElement.closest('.video-card');
+            if (videoContainer) {
+              videoContainer.addEventListener('click', function() {
+                videoElement.muted = true;
+                videoElement.play().catch(e => {
+                  console.log('用户交互后播放失败:', e);
+                });
+              }, { once: true });
+            }
+          });
+        }
+      });
+    });
+    
+    // 微信卡片功能（增强版：复制+跳转）
+    const wechatCard = document.getElementById('wechatCard');
+    const wechatId = document.getElementById('wechatId');
+    
+    if (wechatCard && wechatId) {
+      wechatCard.addEventListener('click', function() {
+        const wechatNumber = 'Clay1273540767';
+        
+        // 复制微信号到剪贴板（增强兼容性）
+        const copyToClipboard = (text) => {
+          if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+          } else {
+            // 降级方案：使用 textarea 和 execCommand
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              return Promise.resolve();
+            } catch (err) {
+              return Promise.reject(err);
+            } finally {
+              document.body.removeChild(textArea);
+            }
+          }
+        };
+
+        copyToClipboard(wechatNumber).then(() => {
+          // 创建复制成功提示
+          const originalText = wechatId.textContent;
+          wechatId.textContent = '已复制到剪贴板！';
+          wechatId.style.color = '#7C3AED';
+          
+          // 2秒后恢复原始文本
+          setTimeout(() => {
+            wechatId.textContent = originalText;
+            wechatId.style.color = '';
+          }, 2000);
+          
+          // 尝试打开微信（微信的URL scheme）
+          try {
+            window.location.href = 'weixin://';
+            
+            // 如果上面的方法被阻止，尝试备用方法
+            setTimeout(() => {
+              alert('微信号 "' + wechatNumber + '" 已复制到剪贴板，请打开微信添加好友！');
+            }, 500);
+          } catch (e) {
+            // 如果打开微信失败，直接显示提示
+            alert('微信号 "' + wechatNumber + '" 已复制到剪贴板，请打开微信添加好友！');
+          }
+        }).catch(err => {
+          console.error('复制失败:', err);
+          alert('请手动复制微信号: ' + wechatNumber);
+        });
+      });
+      
+      // 添加鼠标悬停效果
+      wechatCard.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 8px 25px -5px rgba(124, 58, 237, 0.2)';
+      });
+      
+      wechatCard.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+        this.style.boxShadow = '';
+      });
+    }
     
     // 初始加载和滚动时触发
     window.addEventListener('load', () => {
