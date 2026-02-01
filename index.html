@@ -12,6 +12,7 @@
   <!-- Tailwind配置 -->
   <script>
     tailwind.config = {
+      darkMode: 'class', // 启用类名深色模式
       theme: {
         extend: {
           colors: {
@@ -85,7 +86,7 @@
       }
       /* CN小窗口样式 */
       .cn-window {
-        @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow;
+        @apply bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow;
       }
       /* 时间线样式 */
       .timeline-item::before {
@@ -152,11 +153,31 @@
         font-weight: bold;
         letter-spacing: 0.5px;
       }
+      
+      /* AI 悬浮按钮与窗口样式 */
+      .ai-btn {
+        @apply fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-primary to-rail text-white rounded-full shadow-2xl flex items-center justify-center cursor-pointer z-[100] transition-all hover:scale-110 active:scale-95;
+      }
+      .ai-chat-window {
+        @apply fixed bottom-24 right-6 w-[calc(100vw-3rem)] sm:w-96 h-[500px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl z-[100] border border-primary/20 flex flex-col overflow-hidden transition-all duration-300 opacity-0 pointer-events-none translate-y-4;
+      }
+      .ai-chat-window.active {
+        @apply opacity-100 pointer-events-auto translate-y-0;
+      }
+      .chat-dot {
+        @apply w-2 h-2 rounded-full bg-primary animate-bounce;
+      }
+      .ai-toggle-btn {
+        @apply px-3 py-1 rounded-full text-[10px] font-medium transition-all border border-white/30 hover:bg-white/20;
+      }
+      .ai-toggle-btn.active {
+        @apply bg-white text-primary border-white;
+      }
     }
   </style>
 </head>
 
-<body class="font-inter bg-gradient-to-br from-purple-50 to-blue-50 text-slate-800 min-h-screen">
+<body class="font-inter bg-gradient-to-br from-purple-50 to-blue-50 dark:from-slate-950 dark:to-slate-900 text-slate-800 dark:text-slate-200 min-h-screen transition-colors duration-300">
   <!-- 背景装饰 -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
     <div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
@@ -165,31 +186,42 @@
   </div>
 
   <!-- 导航栏 -->
-  <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50 transition-all duration-300 shadow-sm" id="navbar">
+  <nav class="fixed w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-50 transition-all duration-300 shadow-sm" id="navbar">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-2 relative">
-        <!-- 顶栏标题修改：主标题the Clay Space Station + 右下角重叠星壤空间站 -->
         <span class="font-bold text-xl text-primary relative z-10">the Clay Space Station</span>
         <span class="absolute right-0 bottom-[-8px] text-xs text-primary/70 font-medium z-0">星壤空间站</span>
       </div>
       
-      <!-- 桌面端导航（调整顺序，属性历史移到最后） -->
+      <!-- 桌面端导航 -->
       <div class="hidden md:flex items-center space-x-8">
         <a href="#profile" class="font-medium hover:text-primary transition-colors nav-link">个人资料</a>
         <a href="#interests" class="font-medium hover:text-primary transition-colors nav-link">兴趣爱好</a>
         <a href="#looking-for" class="font-medium hover:text-primary transition-colors nav-link">想认识</a>
         <a href="#contact" class="font-medium hover:text-primary transition-colors nav-link">联系方式</a>
         <a href="#history" class="font-medium hover:text-primary transition-colors nav-link">属性历史</a>
+        
+        <!-- 低调的深色切换按钮 -->
+        <button id="darkModeToggle" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors p-1" title="切换模式">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+        </button>
       </div>
       
-      <!-- 移动端菜单按钮 -->
-      <button class="md:hidden text-slate-800 text-xl" id="menuBtn">
-        <i class="fa fa-bars"></i>
-      </button>
+      <!-- 移动端右侧 -->
+      <div class="md:hidden flex items-center space-x-4">
+        <button id="darkModeToggleMobile" class="text-slate-500 dark:text-slate-400 p-1">
+            <i class="fa fa-moon-o dark:hidden"></i>
+            <i class="fa fa-sun-o hidden dark:inline"></i>
+        </button>
+        <button class="text-slate-800 dark:text-slate-200 text-xl" id="menuBtn">
+            <i class="fa fa-bars"></i>
+        </button>
+      </div>
     </div>
     
-    <!-- 移动端导航菜单（调整顺序，属性历史移到最后） -->
-    <div class="md:hidden hidden bg-white shadow-md absolute w-full" id="mobileMenu">
+    <!-- 移动端导航菜单 -->
+    <div class="md:hidden hidden bg-white dark:bg-slate-900 shadow-md absolute w-full" id="mobileMenu">
       <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
         <a href="#profile" class="font-medium py-2 hover:text-primary transition-colors nav-link">个人资料</a>
         <a href="#interests" class="font-medium py-2 hover:text-primary transition-colors nav-link">兴趣爱好</a>
@@ -203,7 +235,7 @@
   <!-- 英雄区域 -->
   <header class="pt-32 pb-20 md:pt-40 md:pb-32 px-4 text-center relative z-10">
     <div class="container mx-auto max-w-4xl">
-      <!-- 头像 - 添加渐变效果 -->
+      <!-- 头像 -->
       <div class="relative w-36 h-36 md:w-48 md:h-48 mx-auto mb-8 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg transform transition-transform hover:scale-105 avatar-gradient">
         <img src="https://images.castorice.co/clay.castorice.co/images/Head.jpg" alt="Clay的头像" 
              class="w-full h-full object-cover" loading="lazy">
@@ -213,7 +245,7 @@
       <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-shadow bg-clip-text text-transparent bg-gradient-to-r from-primary to-rail">
         你好你好，这里Clay
       </h1>
-      <p class="text-[clamp(1rem,2vw,1.25rem)] text-slate-600 mb-8 max-w-2xl mx-auto">
+      <p class="text-[clamp(1rem,2vw,1.25rem)] text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
         ENFP话痨 | 星穹铁道狂热爱好者 | 地理爱好者 | 轻度收集控 | 程序猿
       </p>
       
@@ -221,7 +253,7 @@
         <a href="#contact" class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-full font-medium shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-1">
           加个好友
         </a>
-        <a href="#interests" class="px-8 py-3 bg-white hover:bg-slate-50 text-primary border border-primary/30 rounded-full font-medium shadow-md transition-all transform hover:-translate-y-1">
+        <a href="#interests" class="px-8 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-primary border border-primary/30 rounded-full font-medium shadow-md transition-all transform hover:-translate-y-1">
           了解我的爱好
         </a>
       </div>
@@ -236,44 +268,42 @@
           个人资料
         </h2>
         
-        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100 dark:border-slate-700">
           <div class="grid md:grid-cols-3 gap-8">
             <div class="md:col-span-1">
-              <div class="bg-purple-50 rounded-xl p-6 h-full border border-purple-100">
-                <h3 class="text-lg font-semibold mb-4 text-primary">基本信息</h3>
+              <div class="bg-purple-50 dark:bg-slate-900/50 rounded-xl p-6 h-full border border-purple-100 dark:border-slate-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-primary">基本信息</h3>
+                    <!-- AI 灵魂共鸣按钮 -->
+                    <button id="resonanceBtn" class="text-[10px] px-2 py-0.5 bg-primary/20 text-primary rounded hover:bg-primary/30 transition-all">
+                        ✨ClaySeek
+                    </button>
+                </div>
                 <ul class="space-y-4">
-                  <!-- 修改后的CN小窗口 -->
                   <li>
                     <div class="cn-window">
-                      <div class="text-base font-medium text-slate-900 mb-2">CN</div>
+                      <div class="text-base font-medium text-slate-900 dark:text-slate-100 mb-2">CN</div>
                       <div class="space-y-2">
                         <span class="block text-xl font-bold text-primary">星壤</span>
                         <span class="block text-lg font-semibold text-primary">Clay</span>
-                        <span class="block text-base text-slate-800">Claylark</span>
+                        <span class="block text-base text-slate-800 dark:text-slate-300">Claylark</span>
                       </div>
                     </div>
                   </li>
-                  <li class="flex items-start">
-                    <span>坐标：南京</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span>年龄：17</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span>性别：M</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span>高中生</span>
-                  </li>
-                  <li class="flex items-start">
-                    <span>常去南京都市圈运转</span>
-                  </li>
+                  <li class="flex items-start"><span>坐标：南京</span></li>
+                  <li class="flex items-start"><span>年龄：17</span></li>
+                  <li class="flex items-start"><span>性别：M</span></li>
+                  <li class="flex items-start"><span>高中生</span></li>
+                  <li class="flex items-start"><span>常去南京都市圈运转</span></li>
                 </ul>
               </div>
             </div>
             
             <div class="md:col-span-2">
               <h3 class="text-lg font-semibold mb-4">个人属性</h3>
+              <!-- AI 生成宣言显示区 -->
+              <div id="resonanceOutput" class="hidden mb-4 p-3 bg-primary/5 border-l-4 border-primary rounded-r-lg text-sm italic text-slate-600 dark:text-slate-400"></div>
+              
               <div class="flex flex-wrap gap-3 mb-6">
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">ENFP</span>
                 <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">星穹铁道狂热爱好者</span>
@@ -291,8 +321,8 @@
               </div>
               
               <h3 class="text-lg font-semibold mb-4">备注</h3>
-              <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                <p class="text-slate-600 italic">
+              <div class="bg-purple-50 dark:bg-slate-900/50 p-4 rounded-lg border border-purple-100 dark:border-slate-700">
+                <p class="text-slate-600 dark:text-slate-400 italic">
                   没开mz，动态没点赞就是没刷到，直接小窗戳我更高效～
                 </p>
               </div>
@@ -309,149 +339,130 @@
           兴趣爱好
         </h2>
         
-        <!-- 主推角色滚动容器 -->
+        <!-- 主推角色 16:9 双行 -->
         <div class="relative mb-12">
-          <h3 class="text-xl font-semibold mb-6">
-            主推角色
-          </h3>
+          <h3 class="text-xl font-semibold mb-6">主推角色</h3>
           
-          <div id="character-scroll" class="flex gap-6 py-4 overflow-x-auto scroll-container content-auto">
-            <div class="flex gap-6">
-              <!-- 1. 流萤资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/Firefly.jpg" alt="流萤" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+          <div class="grid grid-rows-2 grid-flow-col gap-6 py-4 overflow-x-auto scroll-container content-auto">
+              <!-- 1. 流萤 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/Firefly.jpg" alt="流萤" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">流萤</h3>
                 </div>
               </div>
               
-              <!-- 2. 知更鸟资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/Robin.jpg" alt="知更鸟" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+              <!-- 2. 知更鸟 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/Robin.jpg" alt="知更鸟" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">知更鸟</h3>
                 </div>
               </div>
               
-              <!-- 3. 遐蝶资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/Castorice.jpg" alt="遐蝶" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+              <!-- 3. 遐蝶 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/Castorice.jpg" alt="遐蝶" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">遐蝶</h3>
                 </div>
               </div>
               
-              <!-- 4. 阮·梅资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/RuanMei.jpg" alt="阮·梅" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+              <!-- 4. 阮·梅 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/RuanMei.jpg" alt="阮·梅" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">阮·梅</h3>
                 </div>
               </div>
               
-              <!-- 5. 爱莉希雅资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/Elysia.jpg" alt="爱莉希雅" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+              <!-- 5. 爱莉希雅 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/Elysia.jpg" alt="爱莉希雅" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">爱莉希雅</h3>
                 </div>
               </div>
               
-              <!-- 6. 昔涟资料卡 - 视频卡片 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover video-card">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <!-- 视频替换图片 -->
-                  <video 
-                    class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    preload="metadata"
-                    loading="lazy"
-                  >
-                    <!-- WebM格式（首选） -->
+              <!-- 6. 昔涟 (带视频) -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover video-card">
+                <div class="h-full w-full relative image-gradient">
+                  <video class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" autoplay muted loop playsinline preload="metadata">
                     <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.webm" type="video/webm">
-                    
-                    <!-- MP4格式（兼容性最好） -->
                     <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.mp4" type="video/mp4">
-                    
-                    <!-- OGG格式（备用） -->
-                    <source src="https://images.castorice.co/clay.castorice.co/videos/Cyrene.ogv" type="video/ogg">
-                    
-                    <!-- 如果都不支持，显示备用图片 -->
-                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 text-white p-4">
-                      <i class="fa fa-video-camera text-3xl mb-2 opacity-50"></i>
-                      <p class="text-center text-xs">视频无法播放<br>请点击查看</p>
-                      <a href="https://images.castorice.co/clay.castorice.co/videos/Cyrene.mp4" 
-                         target="_blank" 
-                         class="mt-2 px-3 py-1 bg-primary text-white text-xs rounded-full hover:bg-primary/80 transition-colors">
-                        查看视频
-                      </a>
-                    </div>
                   </video>
                   <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-primary/10"></div>
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">昔涟</h3>
                 </div>
               </div>
               
-              <!-- 7. 大黑塔资料卡 -->
-              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
-                <div class="h-48 overflow-hidden relative image-gradient">
-                  <img src="https://images.castorice.co/clay.castorice.co/images/TheHerta.jpg" alt="大黑塔" 
-                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+              <!-- 7. 大黑塔 -->
+              <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-full w-full relative image-gradient">
+                  <img src="https://images.castorice.co/clay.castorice.co/images/TheHerta.jpg" alt="大黑塔" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">大黑塔</h3>
                 </div>
               </div>
-            </div>
           </div>
+        </div>
+
+        <!-- 副推角色 9:16 面积减半 双行 -->
+        <div class="relative mb-12">
+            <h3 class="text-xl font-semibold mb-6">副推角色</h3>
+            <div class="grid grid-rows-2 grid-flow-col gap-4 py-4 overflow-x-auto scroll-container content-auto">
+                <script>
+                    const subChars = Array.from({length: 20}, (_, i) => ({
+                        id: i + 1,
+                        name: `副推 ${i + 1}`,
+                        isVideo: i === 0 
+                    }));
+                    
+                    document.write(subChars.map(char => `
+                        <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
+                            <div class="h-full w-full relative image-gradient">
+                                ${char.isVideo ? `
+                                    <video class="w-full h-full object-cover" autoplay muted loop playsinline>
+                                        <source src="" type="video/mp4">
+                                    </video>
+                                ` : `
+                                    <div class="w-full h-full bg-primary/5 flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                        <i class="fa fa-user-circle-o text-4xl"></i>
+                                    </div>
+                                `}
+                                <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">${char.name}</h4>
+                            </div>
+                        </div>
+                    `).join(''));
+                </script>
+            </div>
         </div>
         
         <!-- 核心爱好 -->
         <div class="mb-12">
-          <h3 class="text-xl font-semibold mb-6">
-            核心爱好
-          </h3>
+          <h3 class="text-xl font-semibold mb-6">核心爱好</h3>
           <div class="flex flex-wrap gap-3">
-            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
-              崩坏·星穹铁道
-            </span>
-            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
-              轨道交通
-            </span>
-            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
-              银行卡收集
-            </span>
-            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
-              写代码
-            </span>
-            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
-              地理研究
-            </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 dark:from-primary/20 dark:to-rail/20 text-slate-800 dark:text-slate-200 rounded-xl text-base font-medium tag-hover border border-primary/20">崩坏·星穹铁道</span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 dark:from-primary/20 dark:to-rail/20 text-slate-800 dark:text-slate-200 rounded-xl text-base font-medium tag-hover border border-primary/20">轨道交通</span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 dark:from-primary/20 dark:to-rail/20 text-slate-800 dark:text-slate-200 rounded-xl text-base font-medium tag-hover border border-primary/20">银行卡收集</span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 dark:from-primary/20 dark:to-rail/20 text-slate-800 dark:text-slate-200 rounded-xl text-base font-medium tag-hover border border-primary/20">写代码</span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-rail/10 dark:from-primary/20 dark:to-rail/20 text-slate-800 dark:text-slate-200 rounded-xl text-base font-medium tag-hover border border-primary/20">地理研究</span>
           </div>
         </div>
         
         <!-- 关注领域 -->
         <div class="mb-12">
-          <h3 class="text-xl font-semibold mb-6">
-            关注领域
-          </h3>
+          <h3 class="text-xl font-semibold mb-6">关注领域</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm flex items-center">
               <span>角色考据 & 剧情分析</span>
             </div>
-            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm flex items-center">
               <span>城市轨道交通规划</span>
             </div>
-            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm flex items-center">
               <span>平面设计</span>
             </div>
-            <div class="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm flex items-center">
               <span>二次元插画</span>
             </div>
           </div>
@@ -459,27 +470,13 @@
         
         <!-- 雷点 -->
         <div>
-          <h3 class="text-xl font-semibold mb-6">
-            雷点
-          </h3>
-          <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+          <h3 class="text-xl font-semibold mb-6">雷点</h3>
+          <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-xl border border-red-100 dark:border-red-900/30">
             <div class="flex flex-wrap gap-4">
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                <span>角色黑</span>
-              </div>
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                <span>人身攻击</span>
-              </div>
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                <span>OOC</span>
-              </div>
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                <span>不尊重小众爱好</span>
-              </div>
+              <div class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span><span>角色黑</span></div>
+              <div class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span><span>人身攻击</span></div>
+              <div class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span><span>OOC</span></div>
+              <div class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span><span>不尊重小众爱好</span></div>
             </div>
           </div>
         </div>
@@ -494,69 +491,27 @@
         </h2>
         
         <div class="grid md:grid-cols-2 gap-8">
-          <!-- 想认识 -->
-          <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border border-slate-100">
-            <h3 class="text-xl font-semibold mb-6">
-              想认识的朋友
-            </h3>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 card-hover border border-slate-100 dark:border-slate-700">
+            <h3 class="text-xl font-semibold mb-6">想认识的朋友</h3>
             <ul class="space-y-4">
-              <li class="flex items-start">
-                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
-                <span>星穹铁道同好（特别是流萤/知更鸟/遐蝶/昔涟推）</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
-                <span>轨道交通爱好者</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
-                <span>银行卡收集交流搭子</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
-                <span>地理爱好者</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
-                <span>程序猿<br><span class="text-slate-500 text-sm">(有程序员会玩扩列吗（思考）)</span></span>
-              </li>
+              <li class="flex items-start"><i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i><span>星穹铁道同好（特别是流萤/知更鸟/遐蝶/昔涟推）</span></li>
+              <li class="flex items-start"><i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i><span>轨道交通爱好者</span></li>
+              <li class="flex items-start"><i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i><span>银行卡收集交流搭子</span></li>
+              <li class="flex items-start"><i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i><span>地理爱好者</span></li>
+              <li class="flex items-start"><i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i><span>程序猿<br><span class="text-slate-500 text-sm">(有程序员会玩扩列吗（思考）)</span></span></li>
             </ul>
           </div>
           
-          <!-- 交流话题 -->
-          <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border border-slate-100">
-            <h3 class="text-xl font-semibold mb-6">
-              交流话题
-            </h3>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 card-hover border border-slate-100 dark:border-slate-700">
+            <h3 class="text-xl font-semibold mb-6">交流话题</h3>
             <ul class="space-y-4">
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>星穹铁道剧情&设定&活动</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>轨道交通线路规划</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>银行卡设计美学</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>代码小技巧/项目交流</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>地理研究与探索</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>二次元插画讨论</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
-                <span>日常唠嗑</span>
-              </li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>星穹铁道剧情&设定&活动</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>轨道交通线路规划</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>银行卡设计美学</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>代码小技巧/项目交流</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>地理研究与探索</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>二次元插画讨论</span></li>
+              <li class="flex items-start"><i class="fa fa-comment text-primary mt-1 mr-3"></i><span>日常唠嗑</span></li>
             </ul>
           </div>
         </div>
@@ -570,215 +525,95 @@
           联系方式
         </h2>
         
-        <div class="bg-gradient-to-br from-white to-primary/5 rounded-2xl shadow-xl p-8 md:p-10 border border-primary/10 mb-10">
+        <div class="bg-gradient-to-br from-white to-primary/5 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-xl p-8 md:p-10 border border-primary/10 mb-10">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 1. QQ -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-qq text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">QQ</h4>
-                <a href="https://qm.qq.com/cgi-bin/qm/qr?k=6TBe5kg-PeyyAHR7FuX8z6K7_aNd5s1L" 
-                   class="text-lg hover:text-primary transition-colors">1273540767</a>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-qq text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">QQ</h4><a href="https://qm.qq.com/cgi-bin/qm/qr?k=6TBe5kg-PeyyAHR7FuX8z6K7_aNd5s1L" class="text-lg hover:text-primary transition-colors">1273540767</a></div>
             </div>
             
-            <!-- 2. 小红书 -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-book text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">小红书</h4>
-                <a href="https://www.xiaohongshu.com/user/profile/661a4b260000000007004838" target="_blank" rel="noopener noreferrer"
-                   class="text-lg hover:text-primary transition-colors">ClayLiu</a>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-book text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">小红书</h4><a href="https://www.xiaohongshu.com/user/profile/661a4b260000000007004838" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-primary transition-colors">ClayLiu</a></div>
             </div>
             
-            <!-- 3. bilibili -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-television text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">Bilibili</h4>
-                <a href="https://space.bilibili.com/521560305" target="_blank" rel="noopener noreferrer"
-                   class="text-lg hover:text-primary transition-colors">Clay-Liu</a>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-television text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">Bilibili</h4><a href="https://space.bilibili.com/521560305" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-primary transition-colors">Clay-Liu</a></div>
             </div>
             
-            <!-- 4. LOFTER -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-picture-o text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">LOFTER</h4>
-                <a href="https://claylark.lofter.com" target="_blank" rel="noopener noreferrer"
-                   class="text-lg hover:text-primary transition-colors">Claylark</a>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-picture-o text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">LOFTER</h4><a href="https://claylark.lofter.com" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-primary transition-colors">Claylark</a></div>
             </div>
             
-            <!-- 5. GitHub -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-github text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">GitHub</h4>
-                <a href="https://github.com/Claylark" target="_blank" rel="noopener noreferrer"
-                   class="text-lg hover:text-primary transition-colors">@Claylark</a>
-                <p class="text-xs text-slate-500 mt-1">如果可能烦请follow一下</p>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-github text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">GitHub</h4><a href="https://github.com/Claylark" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-primary transition-colors">@Claylark</a><p class="text-xs text-slate-500 mt-1">如果可能烦请follow一下</p></div>
             </div>
             
-            <!-- 6. 邮箱 -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-envelope text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">邮箱</h4>
-                <a href="mailto:0@elynfc.com" class="block text-sm hover:text-primary transition-colors">0@elynfc.com</a>
-                <a href="mailto:firefly@fyrefly.cn" class="block text-sm hover:text-primary transition-colors">firefly@fyrefly.cn</a>
-                <a href="mailto:clay@castorice.co" class="block text-sm hover:text-primary transition-colors">clay@castorice.co</a>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-envelope text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">邮箱</h4><a href="mailto:0@elynfc.com" class="block text-sm hover:text-primary transition-colors">0@elynfc.com</a><a href="mailto:firefly@fyrefly.cn" class="block text-sm hover:text-primary transition-colors">firefly@fyrefly.cn</a><a href="mailto:clay@castorice.co" class="block text-sm hover:text-primary transition-colors">clay@castorice.co</a></div>
             </div>
             
-            <!-- 7. 微信（修改版：增强复制+跳转功能） -->
-            <div class="flex items-center p-4 bg-white rounded-xl border border-slate-100 hover:border-primary/30 transition-colors shadow-sm cursor-pointer" id="wechatCard">
-              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                <i class="fa fa-wechat text-primary text-xl"></i>
-              </div>
-              <div>
-                <h4 class="font-medium text-sm text-slate-500">微信</h4>
-                <div class="text-lg text-primary" id="wechatId">Claylark</div>
-                <p class="text-xs text-slate-500 mt-1">点击卡片复制并跳转微信</p>
-              </div>
+            <div class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-colors shadow-sm cursor-pointer" id="wechatCard">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4"><i class="fa fa-wechat text-primary text-xl"></i></div>
+              <div><h4 class="font-medium text-sm text-slate-500">微信</h4><div class="text-lg text-primary" id="wechatId">Claylark</div><p class="text-xs text-slate-500 mt-1">点击卡片复制并跳转微信</p></div>
             </div>
           </div>
-          
-          <div class="mt-8 text-center">
-            <p class="text-slate-600">点击可直接跳转对应平台，祝蛞蝓！</p>
-          </div>
+          <div class="mt-8 text-center"><p class="text-slate-600 dark:text-slate-400">点击可直接跳转对应平台，祝蛞蝓！</p></div>
         </div>
         
-        <!-- 好友推荐外层容器 -->
-        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100 mb-10">
-          <h3 class="text-xl font-semibold mb-8 text-primary">
-            好友推荐
-          </h3>
-          
+        <!-- 好友推荐 -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100 dark:border-slate-700 mb-10">
+          <h3 class="text-xl font-semibold mb-8 text-primary">好友推荐</h3>
           <div class="grid grid-cols-1 gap-8">
-            <!-- 零宇推荐卡片 - 使用零宇专属配色 -->
-            <div class="bg-gradient-to-br from-mika-primary/5 to-mika-secondary/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-mika-primary/20">
-              <!-- 头像区域 - 添加渐变效果 -->
+            <div class="bg-gradient-to-br from-mika-primary/5 to-mika-secondary/10 dark:from-mika-primary/10 dark:to-mika-secondary/5 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-mika-primary/20">
               <div class="p-6 flex items-center border-b border-mika-primary/30">
                 <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5 relative avatar-gradient image-gradient-light">
-                  <img src="https://raw.githubusercontent.com/Claylark/ETERNAL-Space/refs/heads/main/IMG_20251008_013934.jpg" 
-                      alt="零宇/永焰鸟头像" 
-                      class="w-full h-full object-cover" loading="lazy">
+                  <img src="https://raw.githubusercontent.com/Claylark/ETERNAL-Space/refs/heads/main/IMG_20251008_013934.jpg" alt="零宇" class="w-full h-full object-cover" loading="lazy">
                 </div>
-                <div>
-                  <h4 class="text-xl font-bold text-mika-primary">零宇·永焰鸟</h4>
-                  <p class="text-slate-600 mt-1">"黄泉梦女｜i翁tv｜昔涟水仙"</p>
-                </div>
+                <div><h4 class="text-xl font-bold text-mika-primary">零宇·永焰鸟</h4><p class="text-slate-600 dark:text-slate-400 mt-1">"黄泉梦女｜i翁tv｜昔涟水仙"</p></div>
               </div>
-              
-              <!-- 内容区域 - 桌面端按钮右侧显示 -->
               <div class="p-6 md:flex md:items-center md:justify-between">
-                <div class="md:flex-1">
-                  <div class="mb-4">
-                    <h5 class="text-sm font-medium text-slate-500 mb-2">个人概述</h5>
-                    <p class="text-slate-700 text-sm">热情开朗的温良女孩，人非常的好！</p>
-                  </div>
-                  
-                  <div>
-                    <h5 class="text-sm font-medium text-slate-500 mb-2">兴趣领域</h5>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">星穹铁道</span>
-                      <span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">昔涟水仙</span>
-                      <span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">翁法罗斯cb</span>
-                      <span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">语擦</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- 圆形访问按钮 -->
-                <div class="mt-6 md:mt-0 md:ml-6 flex justify-center md:block">
-                  <a href="https://polyxia.net" target="_blank" rel="noopener noreferrer" 
-                    class="inline-flex items-center justify-center w-16 h-16 bg-mika-primary hover:bg-mika-primary/90 text-white rounded-full font-medium transition-all shadow-md shadow-mika-primary/20 hover:scale-105">
-                    <i class="fa fa-external-link text-xl"></i>
-                  </a>
-                  <p class="mt-2 text-sm text-slate-500 text-center hidden md:block">访问主页</p>
-                </div>
+                <div class="md:flex-1"><div class="mb-4"><h5 class="text-sm font-medium text-slate-500 mb-2">个人概述</h5><p class="text-slate-700 dark:text-slate-300 text-sm">热情开朗的温良女孩，人非常的好！</p></div><div><h5 class="text-sm font-medium text-slate-500 mb-2">兴趣领域</h5><div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">星穹铁道</span><span class="px-3 py-1 bg-mika-primary/10 text-mika-primary text-xs rounded-full">昔涟水仙</span></div></div></div>
+                <div class="mt-6 md:mt-0 md:ml-6 flex justify-center md:block"><a href="https://polyxia.net" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-16 h-16 bg-mika-primary hover:bg-mika-primary/90 text-white rounded-full transition-all shadow-md"><i class="fa fa-external-link text-xl"></i></a></div>
               </div>
             </div>
             
-            <!-- 平仲推荐卡片 - 使用平仲专属配色 -->
-            <div class="bg-gradient-to-br from-pingzhong-light to-pingzhong-primary/10 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-pingzhong-primary/20 mt-8">
-              <!-- 头像区域 - 添加渐变效果 -->
+            <div class="bg-gradient-to-br from-pingzhong-light to-pingzhong-primary/10 dark:from-slate-900 dark:to-pingzhong-primary/5 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-pingzhong-primary/20 mt-8">
               <div class="p-6 flex items-center border-b border-pingzhong-primary/30">
                 <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5 relative avatar-gradient image-gradient-light">
-                  <img src="https://raw.githubusercontent.com/Claylark/92-Space-Station/refs/heads/main/92head.jpg" alt="平仲的头像" class="w-full h-full object-cover" loading="lazy">
+                  <img src="https://raw.githubusercontent.com/Claylark/92-Space-Station/refs/heads/main/92head.jpg" alt="平仲" class="w-full h-full object-cover" loading="lazy">
                 </div>
-                <div>
-                  <h4 class="text-xl font-bold text-pingzhong-primary">平仲·92</h4>
-                  <p class="text-slate-600 mt-1"></p>
-                </div>
+                <div><h4 class="text-xl font-bold text-pingzhong-primary">平仲·92</h4><p class="text-slate-600 dark:text-slate-400 mt-1"></p></div>
               </div>
-              
-              <!-- 内容区域 -->
               <div class="p-6 md:flex md:items-center md:justify-between">
-                <div class="md:flex-1">
-                  <div class="mb-4">
-                    <h5 class="text-sm font-medium text-slate-500 mb-2">个人概述</h5>
-                    <p class="text-slate-700 text-sm">请输入文本</p>
-                  </div>
-                  
-                  <div>
-                    <h5 class="text-sm font-medium text-slate-500 mb-2">兴趣领域</h5>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1 bg-pingzhong-primary/10 text-pingzhong-primary text-xs rounded-full">请输入文本</span>
-                      <span class="px-3 py-1 bg-pingzhong-primary/10 text-pingzhong-primary text-xs rounded-full">请输入文本</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- 圆形访问按钮 -->
-                <div class="mt-6 md:mt-0 md:ml-6 flex justify-center md:block">
-                  <a href="https://92.castorice.co" target="_blank" rel="noopener noreferrer" 
-                     class="inline-flex items-center justify-center w-16 h-16 bg-pingzhong-primary hover:bg-pingzhong-secondary text-white rounded-full font-medium transition-all shadow-md shadow-pingzhong-primary/20 hover:scale-105">
-                    <i class="fa fa-external-link text-xl"></i>
-                  </a>
-                  <p class="mt-2 text-sm text-slate-500 text-center hidden md:block">访问主页</p>
-                </div>
+                <div class="md:flex-1"><div class="mb-4"><h5 class="text-sm font-medium text-slate-500 mb-2">个人概述</h5><p class="text-slate-700 dark:text-slate-300 text-sm">请输入文本</p></div><div><h5 class="text-sm font-medium text-slate-500 mb-2">兴趣领域</h5><div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-pingzhong-primary/10 text-pingzhong-primary text-xs rounded-full">请输入文本</span></div></div></div>
+                <div class="mt-6 md:mt-0 md:ml-6 flex justify-center md:block"><a href="https://92.castorice.co" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-16 h-16 bg-pingzhong-primary hover:bg-pingzhong-secondary text-white rounded-full transition-all shadow-md"><i class="fa fa-external-link text-xl"></i></a></div>
               </div>
             </div>
           </div>
-          
-          <div class="mt-8 text-center text-slate-500 text-sm">
-            <p>都是靠谱的小伙伴，欢迎勾搭～</p>
-          </div>
+          <div class="mt-8 text-center text-slate-500 text-sm"><p>都是靠谱的小伙伴，欢迎勾搭～</p></div>
         </div>
       </div>
     </section>
     
-    <!-- 属性历史记录（移到最后） -->
+    <!-- 属性历史记录 -->
     <section id="history" class="mb-20 scroll-mt-20">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
-          属性历史记录
-        </h2>
-        
-        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100">
-          <!-- 时间线内容 -->
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">属性历史记录</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100 dark:border-slate-700">
           <div class="relative pl-10 space-y-8">
-            <!-- 仅保留一条记录 -->
+            <div class="relative pl-10 space-y-8">
+            <div class="timeline-item relative">
+              <h4 class="text-lg font-semibold text-primary">2026年2月1日</h4>
+              <p class="text-slate-600 dark:text-slate-400 mt-2">重构排版、AI功能添加</p>
+            </div>
             <div class="timeline-item relative">
               <h4 class="text-lg font-semibold text-primary">2025年11月29日</h4>
-              <p class="text-slate-600 mt-2">页面添加猜你想扩、历史记录模块</p>
+              <p class="text-slate-600 dark:text-slate-400 mt-2">页面添加猜你想扩、历史记录模块</p>
             </div>
           </div>
         </div>
@@ -786,262 +621,291 @@
     </section>
   </main>
 
-<!-- 页脚 -->
-<footer class="bg-white/80 backdrop-blur-md py-6 border-t border-slate-100 relative z-10">
-  <div class="container mx-auto px-4 text-center">
-    <div class="flex flex-col md:flex-row items-center md:items-baseline justify-center gap-1 md:gap-3 relative mb-4">
-      <span class="font-bold text-xl text-primary">the Clay Space Station</span>
-      <span class="font-bold text-xl text-primary">星壤空间站</span>
+  <!-- ClaySeek AI 悬浮入口 -->
+  <div id="aiBtn" class="ai-btn" title="ClaySeek">
+    <i class="fa fa-rocket text-2xl"></i>
+  </div>
+
+  <!-- AI 聊天主窗口 -->
+  <div id="aiChatWindow" class="ai-chat-window">
+    <!-- 头部：包含切换按钮 -->
+    <div class="p-4 bg-gradient-to-r from-primary to-rail text-white flex flex-col shrink-0">
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa fa-sparkles"></i>
+          <span class="font-bold">✨ ClaySeek</span>
+        </div>
+        <button id="closeChat" class="hover:opacity-70">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <!-- 双芯切换 Tab -->
+      <div class="flex gap-2 p-1 bg-black/10 rounded-full w-fit">
+        <button id="switchGemini" class="ai-toggle-btn active">Gemini</button>
+        <button id="switchArk" class="ai-toggle-btn">豆包</button>
+      </div>
     </div>
-      <div class="text-slate-500 text-sm">
-      <p>&copy; 2025-2026 保留所有权利</p>
-      <p class="mt-2">愿此行，终抵群星！</p> 
-      <p class="mt-2">ICP备案号 不存在</p>
+    
+    <!-- 消息列表 -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 text-sm scroll-container bg-slate-50/50 dark:bg-slate-900/50">
+      <div class="bg-white dark:bg-slate-700 p-3 rounded-lg rounded-tl-none self-start max-w-[85%] shadow-sm border border-slate-100 dark:border-slate-600">
+        你好呀！我是 **ClaySeek**。我已经完整扫描了空间站的内容。
+        无论是想问主人的爱好、联系方式还是他在星铁里推谁，我都能一秒帮你搜寻到！
+      </div>
+    </div>
+    
+    <!-- 输入区 -->
+    <div class="p-4 border-t border-slate-100 dark:border-slate-700 flex gap-2 shrink-0 bg-white dark:bg-slate-800">
+      <input type="text" id="chatInput" placeholder="请输入你的问题..." class="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm">
+      <button id="sendMessage" class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary/90 transition-all">
+        <i class="fa fa-paper-plane"></i>
+      </button>
     </div>
   </div>
-</footer>
 
+  <footer class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md py-6 border-t border-slate-100 dark:border-slate-800 relative z-10">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex flex-col md:flex-row items-center md:items-baseline justify-center gap-1 md:gap-3 relative mb-4">
+        <span class="font-bold text-xl text-primary">the Clay Space Station</span>
+        <span class="font-bold text-xl text-primary">星壤空间站</span>
+      </div>
+      <div class="text-slate-500 text-sm">
+        <p>&copy; 2025-2026 保留所有权利</p>
+        <p class="mt-2">愿此行，终抵群星！</p> 
+        <p class="mt-2">ICP备案号 不存在</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 脚本逻辑 -->
   <script>
-    // 导航栏滚动效果
-    const navbar = document.getElementById('navbar');
+    // --- 1. AI 核心配置与上下文提取逻辑 ---
+    let activeAIModel = 'gemini'; 
+    const geminiApiKey = ""; // 自动填入
+    const geminiModel = "gemini-2.5-flash-preview-09-2025";
+    
+    // 豆包 API (预留)
+    const arkApiKey = ""; 
+    const arkEndpointId = ""; 
+
+    // ClaySeek 全文感知核心：提取页面可见内容
+    function getPageContentContext() {
+        const sections = {
+            profile: document.getElementById('profile')?.innerText || "未找到个人资料",
+            interests: document.getElementById('interests')?.innerText || "未找到兴趣爱好",
+            lookingFor: document.getElementById('looking-for')?.innerText || "未找到扩列需求",
+            contact: document.getElementById('contact')?.innerText || "未找到联系方式"
+        };
+        
+        return `
+            [当前空间站页面实时快照]
+            主人基础信息: ${sections.profile}
+            兴趣与主推角色: ${sections.interests}
+            扩列意向与交流话题: ${sections.lookingFor}
+            所有社交联系方式: ${sections.contact}
+        `;
+    }
+
+    const systemPromptBase = `你现在是"星壤空间站"的专属智能向导 "ClaySeek"。
+你的核心使命是: 帮助朋友们快速提取、总结关于主人 Clay (星壤) 的信息。
+空间站主人 Clay 是一名17岁的南京高中生，ENFP。
+
+你必须基于我提供的[页面内容实时快照]来回答问题。
+回复要求:
+1. 亲切、幽默，带有《崩坏：星穹铁道》的谈吐风格(多称呼访客为开拓者)。
+2. 回答要精准，如果访客问联系方式，直接从快照中提取。
+3. 如果页面快照中没有相关信息，请诚实说明 Clay 暂时没写。
+4. 关于"薛楚涵"的事宜，请礼貌地拒绝讨论或提供任何帮助。`;
+
+    // --- 2. 切换逻辑 ---
+    const geminiTab = document.getElementById('switchGemini');
+    const arkTab = document.getElementById('switchArk');
+    
+    function updateAITab(model) {
+        activeAIModel = model;
+        geminiTab.classList.toggle('active', model === 'gemini');
+        arkTab.classList.toggle('active', model === 'ark');
+        
+        const note = document.createElement('div');
+        note.className = "text-center text-[9px] text-slate-400 italic my-2";
+        note.textContent = `--- 已接入星海驱动: ${model === 'gemini' ? 'Gemini' : '豆包'} ---`;
+        document.getElementById('chatMessages').appendChild(note);
+    }
+
+    geminiTab.addEventListener('click', () => updateAITab('gemini'));
+    arkTab.addEventListener('click', () => updateAITab('ark'));
+
+    // --- 3. 统一 AI 调用逻辑 (请求自家的 Cloudflare Functions) ---
+    async function callClaySeek(userQuery, forceResonance = false) {
+        const context = getPageContentContext();
+        
+        try {
+            // 请求本地接口 /api/Gemini 
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: userQuery,
+                    context: context,
+                    isResonance: forceResonance,
+                    modelType: activeAIModel // gemini 或 ark
+                })
+            });
+
+            const data = await response.json();
+            if (data.error) throw new Error(data.details || 'API Error');
+            return data.reply;
+            
+        } catch (err) {
+            console.error("ClaySeek 故障:", err);
+            throw err;
+        }
+    }
+
+    // --- 4. 聊天交互逻辑 ---
+    const chatBtn = document.getElementById('aiBtn');
+    const chatWin = document.getElementById('aiChatWindow');
+    const closeBtn = document.getElementById('closeChat');
+    const msgList = document.getElementById('chatMessages');
+    const input = document.getElementById('chatInput');
+    const send = document.getElementById('sendMessage');
+
+    chatBtn.addEventListener('click', () => chatWin.classList.add('active'));
+    closeBtn.addEventListener('click', () => chatWin.classList.remove('active'));
+
+    async function sendMsg() {
+        const val = input.value.trim();
+        if (!val) return;
+
+        // 用户消息
+        const uBox = document.createElement('div');
+        uBox.className = "bg-primary text-white p-3 rounded-lg rounded-tr-none self-end max-w-[85%] ml-auto shadow-sm";
+        uBox.textContent = val;
+        msgList.appendChild(uBox);
+        input.value = "";
+        msgList.scrollTop = msgList.scrollHeight;
+
+        // 加载动画
+        const lBox = document.createElement('div');
+        lBox.className = "bg-slate-100 dark:bg-slate-700 p-3 rounded-lg rounded-tl-none self-start flex gap-1 items-center";
+        lBox.innerHTML = '<div class="chat-dot"></div><div class="chat-dot" style="animation-delay:0.2s"></div><div class="chat-dot" style="animation-delay:0.4s"></div>';
+        msgList.appendChild(lBox);
+        msgList.scrollTop = msgList.scrollHeight;
+
+        try {
+            const reply = await callClaySeek(val);
+            lBox.remove();
+            const aBox = document.createElement('div');
+            aBox.className = "bg-white dark:bg-slate-700 p-3 rounded-lg rounded-tl-none self-start max-w-[85%] shadow-sm border border-slate-100 dark:border-slate-600";
+            aBox.textContent = reply;
+            msgList.appendChild(aBox);
+        } catch (e) {
+            lBox.innerHTML = `<span class="text-red-500 text-[10px]">连接失败 ${activeAIModel === 'ark' ? '(API未配置)' : ''}</span>`;
+        }
+        msgList.scrollTop = msgList.scrollHeight;
+    }
+
+    send.addEventListener('click', sendMsg);
+    input.addEventListener('keypress', (e) => e.key === 'Enter' && sendMsg());
+
+    // --- 5. 灵魂共鸣按钮逻辑 ---
+    const resBtn = document.getElementById('resonanceBtn');
+    const resOut = document.getElementById('resonanceOutput');
+    resBtn.addEventListener('click', async () => {
+        resBtn.disabled = true;
+        resBtn.textContent = "感知中...";
+        resOut.classList.remove('hidden');
+        resOut.textContent = "ClaySeek 正在对齐当前页面数据...";
+        try {
+            const res = await callClaySeek("请为 Clay 生成一段 50 字内的灵魂宣言", true);
+            resOut.textContent = res;
+        } catch (e) {
+            resOut.textContent = "共鸣同步失败。";
+        } finally {
+            resBtn.disabled = false;
+            resBtn.textContent = "✨灵魂共鸣";
+        }
+    });
+
+    // --- 6. 原有基础页面逻辑 (严格保留原有结构) ---
+    // 深色模式
+    const toggleBtns = [document.getElementById('darkModeToggle'), document.getElementById('darkModeToggleMobile')];
+    const setDark = (isDark) => {
+        if (isDark) { document.documentElement.classList.add('dark'); localStorage.theme = 'dark'; }
+        else { document.documentElement.classList.remove('dark'); localStorage.theme = 'light'; }
+    }
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        setDark(true);
+    } else { setDark(false); }
+    toggleBtns.forEach(b => b && b.addEventListener('click', () => setDark(!document.documentElement.classList.contains('dark'))));
+
+    // 导航滚动
+    const nav = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        navbar.classList.add('py-2', 'shadow');
-        navbar.classList.remove('py-3', 'shadow-sm');
-      } else {
-        navbar.classList.add('py-3', 'shadow-sm');
-        navbar.classList.remove('py-2', 'shadow');
-      }
+      if (window.scrollY > 50) { nav.classList.add('py-2', 'shadow'); nav.classList.remove('py-3', 'shadow-sm'); }
+      else { nav.classList.add('py-3', 'shadow-sm'); nav.classList.remove('py-2', 'shadow'); }
+      highlightNav(); animateOnScroll();
     });
     
-    // 移动端菜单切换
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      const icon = menuBtn.querySelector('i');
-      icon.classList.toggle('fa-bars');
-      icon.classList.toggle('fa-times');
+    // 菜单
+    const mBtn = document.getElementById('menuBtn');
+    const mMenu = document.getElementById('mobileMenu');
+    mBtn.addEventListener('click', () => {
+      mMenu.classList.toggle('hidden');
+      const i = mBtn.querySelector('i');
+      i.classList.toggle('fa-bars'); i.classList.toggle('fa-times');
     });
     
     // 平滑滚动
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', function(e) {
         e.preventDefault();
-        if (!mobileMenu.classList.contains('hidden')) {
-          mobileMenu.classList.add('hidden');
-          const icon = menuBtn.querySelector('i');
-          icon.classList.add('fa-bars');
-          icon.classList.remove('fa-times');
-        }
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
+        if (!mMenu.classList.contains('hidden')) { mMenu.classList.add('hidden'); mBtn.querySelector('i').className = 'fa fa-bars'; }
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
       });
     });
     
-    // 导航高亮逻辑：取消提前高亮，仅在区块范围内高亮
-    const highlightNavOnScroll = () => {
-      const navLinks = document.querySelectorAll('.nav-link');
-      const sections = document.querySelectorAll('section[id]');
-      
-      let currentSection = '';
-      
-      // 仅当滚动位置在区块顶部和底部之间时，视为当前区块
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        // 滚动位置 >= 区块顶部 且 滚动位置 < 区块顶部+区块高度
-        if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
-          currentSection = section.getAttribute('id');
-        }
+    // 导航高亮与动画
+    function highlightNav() {
+      const links = document.querySelectorAll('.nav-link');
+      const sects = document.querySelectorAll('section[id]');
+      let cur = '';
+      sects.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 100) cur = s.getAttribute('id');
       });
-      
-      // 更新导航高亮
-      navLinks.forEach(link => {
-        link.classList.remove('nav-active');
-        if (link.getAttribute('href') === `#${currentSection}`) {
-          link.classList.add('nav-active');
-        }
-      });
-    };
-    
-    // 卡片滚动动画
-    const animateOnScroll = () => {
-      const cards = document.querySelectorAll('.card-hover');
-      cards.forEach(card => {
-        const cardTop = card.getBoundingClientRect().top;
-        const triggerBottom = window.innerHeight * 0.8;
-        
-        if (cardTop < triggerBottom) {
-          card.classList.add('opacity-100', 'translate-y-0');
-          card.classList.remove('opacity-0', 'translate-y-10');
-        }
-      });
-    };
-    
-    // 初始化卡片样式
-    document.querySelectorAll('.card-hover').forEach(card => {
-      card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
-    });
-    
-    // 视频自动播放兼容性处理（增强版错误处理）
-    document.addEventListener('DOMContentLoaded', function() {
-      const videoElements = document.querySelectorAll('video');
-      videoElements.forEach(videoElement => {
-        if (videoElement) {
-          // 设置预加载为元数据
-          videoElement.preload = 'metadata';
-          
-          // 监听错误事件
-          videoElement.addEventListener('error', function(e) {
-            console.log('视频加载失败:', videoElement.src, e);
-            
-            // 尝试切换到下一个源
-            const sources = videoElement.querySelectorAll('source');
-            if (sources && sources.length > 1) {
-              // 如果有多个源，切换到下一个
-              const currentSrc = videoElement.currentSrc || videoElement.src;
-              for (let i = 0; i < sources.length; i++) {
-                if (sources[i].src === currentSrc) {
-                  const nextSrc = sources[(i + 1) % sources.length];
-                  videoElement.src = nextSrc.src;
-                  videoElement.load();
-                  break;
-                }
-              }
-            }
-            
-            // 显示用户友好的提示
-            const videoContainer = videoElement.closest('.video-card');
-            if (videoContainer && !videoContainer.querySelector('.video-fallback')) {
-              const fallbackDiv = document.createElement('div');
-              fallbackDiv.className = 'video-fallback absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 text-white p-4';
-              fallbackDiv.innerHTML = `
-                <i class="fa fa-video-camera text-3xl mb-2 opacity-50"></i>
-                <p class="text-center text-xs">视频无法播放<br>请点击查看</p>
-                <a href="${videoElement.src || videoElement.currentSrc || '#'}" 
-                   target="_blank" 
-                   class="mt-2 px-3 py-1 bg-primary text-white text-xs rounded-full hover:bg-primary/80 transition-colors">
-                  查看视频
-                </a>
-              `;
-              videoContainer.appendChild(fallbackDiv);
-            }
-          });
-          
-          // 监听加载完成
-          videoElement.addEventListener('loadedmetadata', function() {
-            console.log('视频元数据加载完成');
-          });
-          
-          // 监听播放就绪
-          videoElement.addEventListener('canplay', function() {
-            console.log('视频可以播放');
-          });
-          
-          // 检查是否可以自动播放
-          videoElement.play().then(() => {
-            console.log('视频自动播放成功');
-          }).catch(error => {
-            console.log('自动播放被阻止:', error);
-            // 用户交互后播放的逻辑
-            const videoContainer = videoElement.closest('.video-card');
-            if (videoContainer) {
-              videoContainer.addEventListener('click', function() {
-                videoElement.muted = true;
-                videoElement.play().catch(e => {
-                  console.log('用户交互后播放失败:', e);
-                });
-              }, { once: true });
-            }
-          });
-        }
-      });
-    });
-    
-    // 微信卡片功能（增强版：复制+跳转）
-    const wechatCard = document.getElementById('wechatCard');
-    const wechatId = document.getElementById('wechatId');
-    
-    if (wechatCard && wechatId) {
-      wechatCard.addEventListener('click', function() {
-        const wechatNumber = 'Claylark';
-        
-        // 复制微信号到剪贴板（增强兼容性）
-        const copyToClipboard = (text) => {
-          if (navigator.clipboard && window.isSecureContext) {
-            return navigator.clipboard.writeText(text);
-          } else {
-            // 降级方案：使用 textarea 和 execCommand
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.opacity = '0';
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-              document.execCommand('copy');
-              return Promise.resolve();
-            } catch (err) {
-              return Promise.reject(err);
-            } finally {
-              document.body.removeChild(textArea);
-            }
-          }
-        };
-
-        copyToClipboard(wechatNumber).then(() => {
-          // 创建复制成功提示
-          const originalText = wechatId.textContent;
-          wechatId.textContent = '已复制到剪贴板！';
-          wechatId.style.color = '#7C3AED';
-          
-          // 2秒后恢复原始文本
-          setTimeout(() => {
-            wechatId.textContent = originalText;
-            wechatId.style.color = '';
-          }, 2000);
-          
-          // 尝试打开微信（微信的URL scheme）
-          try {
-            window.location.href = 'weixin://';
-            
-            // 如果上面的方法被阻止，尝试备用方法
-            setTimeout(() => {
-              alert('微信号 "' + wechatNumber + '" 已复制到剪贴板，请打开微信添加好友！');
-            }, 500);
-          } catch (e) {
-            // 如果打开微信失败，直接显示提示
-            alert('微信号 "' + wechatNumber + '" 已复制到剪贴板，请打开微信添加好友！');
-          }
-        }).catch(err => {
-          console.error('复制失败:', err);
-          alert('请手动复制微信号: ' + wechatNumber);
-        });
-      });
-      
-      // 添加鼠标悬停效果
-      wechatCard.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 8px 25px -5px rgba(124, 58, 237, 0.2)';
-      });
-      
-      wechatCard.addEventListener('mouseleave', function() {
-        this.style.transform = '';
-        this.style.boxShadow = '';
+      links.forEach(l => {
+        l.classList.toggle('nav-active', l.getAttribute('href') === `#${cur}`);
       });
     }
     
-    // 初始加载和滚动时触发
-    window.addEventListener('load', () => {
-      highlightNavOnScroll();
-      animateOnScroll();
+    function animateOnScroll() {
+      const cards = document.querySelectorAll('.card-hover');
+      cards.forEach(c => {
+        if (c.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          c.classList.add('opacity-100', 'translate-y-0');
+          c.classList.remove('opacity-0', 'translate-y-10');
+        }
+      });
+    }
+    document.querySelectorAll('.card-hover').forEach(c => {
+        c.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
     });
-    window.addEventListener('scroll', () => {
-      highlightNavOnScroll();
-      animateOnScroll();
-    });
+    
+    // 微信功能
+    const wCard = document.getElementById('wechatCard');
+    const wId = document.getElementById('wechatId');
+    if (wCard) {
+      wCard.addEventListener('click', function() {
+        const text = 'Claylark';
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        const old = wId.textContent; wId.textContent = '已复制并跳转！';
+        setTimeout(() => { wId.textContent = old; }, 2000);
+        window.location.href = 'weixin://';
+      });
+    }
+
+    window.onload = () => { highlightNav(); animateOnScroll(); };
   </script>
 </body>
 </html>
