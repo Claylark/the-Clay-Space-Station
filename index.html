@@ -306,6 +306,7 @@
                     </div>
                   </li>
                   <li class="flex items-start"><span>坐标：南京</span></li>
+                  <!-- 年龄显示区 -->
                   <li class="flex items-start"><span>年龄：<span id="clay-age">计算中...</span></span></li>
                   <li class="flex items-start"><span>性别：M</span></li>
                   <li class="flex items-start"><span>高中生</span></li>
@@ -404,7 +405,7 @@
               <!-- 8. 优菈·劳伦斯 -->
               <div class="w-[320px] sm:w-[384px] aspect-[16/9] flex-shrink-0 bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden card-hover">
                 <div class="h-full w-full relative image-gradient bg-sky-50 dark:bg-sky-900/20">
-                  <img data-src="https://picsum.photos/seed/eula/1920/1080" alt="优菈·劳伦斯" class="lazy-img w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+                  <img data-src="https://images.castorice.co/clay.castorice.co/images/Eula_Lawrence.jpg" alt="优菈·劳伦斯" class="lazy-img w-full h-full object-cover transition-transform duration-700 hover:scale-110">
                   <h3 class="character-name absolute bottom-4 right-4 text-xl font-bold z-10">优菈·劳伦斯</h3>
                 </div>
               </div>
@@ -414,30 +415,37 @@
         <div class="relative mb-12">
             <h3 class="text-xl font-semibold mb-6">副推角色</h3>
             <div class="grid grid-rows-2 grid-flow-col gap-4 py-4 overflow-x-auto scroll-container content-auto" id="sub-promoted-container">
+                <!-- 1. 伊冯 -->
                 <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
                     <div class="h-full w-full relative image-gradient">
-                        <img data-src="https://picsum.photos/seed/yvonne/450/800" alt="伊冯" class="lazy-img w-full h-full object-cover">
+                        <img data-src="https://images.castorice.co/clay.castorice.co/images/Yvonne.jpg" alt="伊冯" class="lazy-img w-full h-full object-cover">
                         <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">伊冯</h4>
                     </div>
                 </div>
+                <!-- 2. 别礼 -->
                 <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
                     <div class="h-full w-full relative image-gradient">
-                        <img data-src="https://picsum.photos/seed/bielie/450/800" alt="别礼" class="lazy-img w-full h-full object-cover">
+                        <img data-src="https://images.castorice.co/clay.castorice.co/images/Last_Ride.png" alt="别礼" class="lazy-img w-full h-full object-cover">
                         <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">别礼</h4>
                     </div>
                 </div>
+                <!-- 3. 佩丽卡 -->
                 <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
                     <div class="h-full w-full relative image-gradient">
-                        <img data-src="https://picsum.photos/seed/pelika/450/800" alt="佩莉卡" class="lazy-img w-full h-full object-cover">
-                        <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">佩莉卡</h4>
+                        <img data-src="https://images.castorice.co/clay.castorice.co/images/Perlica.png" alt="佩丽卡" class="lazy-img w-full h-full object-cover">
+                        <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">佩丽卡</h4>
                     </div>
                 </div>
+                <!-- 4. 神里绫华 -->
                 <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
                     <div class="h-full w-full relative image-gradient">
-                        <img data-src="https://picsum.photos/seed/ayaka/450/800" alt="神里绫华" class="lazy-img w-full h-full object-cover">
+                        <img data-src="https://images.castorice.co/clay.castorice.co/images/Kamisato_Ayaka.jpg" alt="神里绫华" class="lazy-img w-full h-full object-cover">
                         <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">神里绫华</h4>
                     </div>
                 </div>
+                
+                <!-- 以下角色暂时注释 -->
+                <!-- 
                 <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
                     <div class="h-full w-full relative image-gradient">
                         <img data-src="https://picsum.photos/seed/kokomi/450/800" alt="珊瑚宫心海" class="lazy-img w-full h-full object-cover">
@@ -480,6 +488,13 @@
                         <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">花火</h4>
                     </div>
                 </div>
+                <div class="w-[130px] sm:w-[150px] aspect-[9/16] flex-shrink-0 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden card-hover border border-slate-100 dark:border-slate-700">
+                    <div class="h-full w-full relative image-gradient">
+                        <div class="w-full h-full bg-primary/5 flex items-center justify-center text-slate-300 dark:text-slate-600"><i class="fa fa-user-circle-o text-4xl"></i></div>
+                        <h4 class="absolute bottom-2 right-3 text-sm font-semibold text-white/90 z-10">副推 12</h4>
+                    </div>
+                </div>
+                -->
             </div>
         </div>
         
@@ -624,10 +639,12 @@
         <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">属性历史记录</h2>
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-slate-100 dark:border-slate-700">
           <div class="relative pl-10 space-y-8">
+            <!-- 最新历史记录 -->
             <div class="timeline-item relative">
               <h4 class="text-lg font-semibold text-primary">2026年2月1日</h4>
               <p class="text-slate-600 dark:text-slate-400 mt-2">页面添加深色模式、添加副推展示、修改主推样式、新增ClaySeek大模型Beta、流量节省优化</p>
             </div>
+            <!-- 旧历史记录 -->
             <div class="timeline-item relative">
               <h4 class="text-lg font-semibold text-primary">2025年11月29日</h4>
               <p class="text-slate-600 dark:text-slate-400 mt-2">页面添加猜你想扩、历史记录模块</p>
