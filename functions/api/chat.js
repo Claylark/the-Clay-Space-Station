@@ -1,44 +1,55 @@
 export async function onRequestPost(context) {
     const { env, request } = context;
     const body = await request.json();
-    const { query, context: pageContext, modelType } = body;
+    const { modelType, contents, messages } = body;
 
-    // 预设系统提示词
-    const systemPrompt = `你现在是"星壤空间站"的向导 ClaySeek。主人 Clay 17岁，南京高中生，ENFP... \n 页面内容：${pageContext}`;
+    // --- Gemini 转发逻辑 ---
+    if (modelType === 'gemini') {
+        const GEMINI_KEY = env.GEMINI_API_KEY;
+        if (!GEMINI_KEY) return new Response(JSON.stringify({ error: "Gemini Key 未配置" }), { status: 500 });
 
-    // --- 分流逻辑 ---
-    
-    // 1. 如果选择的是 豆包 (Ark)
-    if (modelType === 'ark') {
-        const ARK_URL = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
-        const resp = await fetch(ARK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${env.ARK_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: env.ARK_ENDPOINT_ID,
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: query }
-                ]
-            })
-        });
-        const data = await resp.json();
-        return new Response(JSON.stringify({ reply: data.choices?.[0]?.message?.content }));
+        const model = "gemini-2.5-flash-preview-09-2025";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents, systemInstruction: body.systemInstruction })
+            });
+            const data = await response.json();
+            return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+        } catch (e) {
+            return new Response(JSON.stringify({ error: "Gemini 调用失败" }), { status: 500 });
+        }
     }
 
-    // 2. 如果选择的是 Gemini (默认)
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
-    const resp = await fetch(GEMINI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: query }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] }
-        })
-    });
-    const data = await resp.json();
-    return new Response(JSON.stringify({ reply: data.candidates?.[0]?.content?.parts?.[0]?.text }));
+    // --- 豆包 (Ark) 转发逻辑 ---
+    if (modelType === 'ark') {
+        const ARK_KEY = env.ARK_API_KEY;
+        const ENDPOINT_ID = env.ARK_ENDPOINT_ID;
+        if (!ARK_KEY || !ENDPOINT_ID) return new Response(JSON.stringify({ error: "Ark 配置不完整" }), { status: 500 });
+
+        const url = `https://ark.cn-beijing.volces.com/api/v3/chat/completions`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${ARK_KEY}`
+                },
+                body: JSON.stringify({ 
+                    model: ENDPOINT_ID, 
+                    messages: messages 
+                })
+            });
+            const data = await response.json();
+            return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+        } catch (e) {
+            return new Response(JSON.stringify({ error: "Ark 调用失败" }), { status: 500 });
+        }
+    }
+
+    return new Response(JSON.stringify({ error: "无效的模型类型" }), { status: 400 });
 }
